@@ -12,15 +12,15 @@
     -->
     <changeSet id="20201118080043-1" author="jhipster">
         <createTable tableName="app_user">
-            <column name="id" type="bigint">
+            <column name="internal_user_id" type="bigint"><!-- name="id" -->
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="phone" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="internal_user_id" type="bigint">
+            <!--  <column name="internal_user_id" type="bigint">
                 <constraints unique="true" nullable="true" uniqueConstraintName="ux_app_user_internal_user_id" />
-            </column>
+            </column>-->
             <column name="company_id" type="bigint">
                 <constraints nullable="true" />
             </column>

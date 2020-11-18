@@ -1,8 +1,10 @@
 package com.freemind.timesheet.service;
 
 import com.freemind.timesheet.config.Constants;
+import com.freemind.timesheet.domain.AppUser;
 import com.freemind.timesheet.domain.Authority;
 import com.freemind.timesheet.domain.User;
+import com.freemind.timesheet.repository.AppUserRepository;
 import com.freemind.timesheet.repository.AuthorityRepository;
 import com.freemind.timesheet.repository.UserRepository;
 import com.freemind.timesheet.security.AuthoritiesConstants;
@@ -32,7 +34,7 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
-
+    private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
@@ -43,9 +45,11 @@ public class UserService {
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        AppUserRepository appUserRepository
     ) {
         this.userRepository = userRepository;
+        this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -97,7 +101,7 @@ public class UserService {
             );
     }
 
-    public User registerUser(UserDTO userDTO, String password) {
+    public User registerUser(UserDTO userDTO, String password, String phone) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
             .ifPresent(
@@ -140,6 +144,14 @@ public class UserService {
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
+
+        // Create and save the UserExtra entity
+        AppUser newUserExtra = new AppUser();
+        newUserExtra.setInternalUser(newUser);
+        newUserExtra.setPhone(phone);
+        appUserRepository.save(newUserExtra);
+        log.debug("Created Information for UserExtra: {}", newUserExtra);
+
         return newUser;
     }
 
